@@ -1,0 +1,11 @@
+{
+  "name": "ghsa-xqc2-env-vulnerable",
+  "private": true,
+  "type": "module",
+  "description": "Isolated node_modules holding the VULNERABLE react-server-dom-webpack 19.2.8",
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-server-dom-webpack": "19.2.8"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "ghsa-xqc2-env-patched",
+  "private": true,
+  "type": "module",
+  "description": "Isolated node_modules holding the PATCHED react-server-dom-webpack 19.2.9",
+  "dependencies": {
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
+    "react-server-dom-webpack": "19.2.9"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "ghsa-xqc2-xf4c-x3h3-poc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Proof of concept for GHSA-xqc2-xf4c-x3h3 - unauthenticated RCE in React Server Components via typed-array transport desynchronisation",
+  "scripts": {
+    "setup": "npm --prefix env/vulnerable install --legacy-peer-deps --no-audit --no-fund && npm --prefix env/patched install --legacy-peer-deps --no-audit --no-fund",
+    "poc": "node poc/run.mjs",
+    "poc:prod": "node poc/run.mjs --prod",
+    "poc:exec": "node poc/run.mjs --gadget exec",
+    "primitives": "node poc/primitives.mjs",
+    "dos": "node poc/dos.mjs",
+    "detect": "node poc/detect.mjs --scan .",
+    "detect:crawl": "node poc/detect.mjs --crawl http://localhost:3000 --rsc",
+    "clean": "node -e \"require('fs').rmSync('artifacts',{recursive:true,force:true})\"",
+    "docker:up": "docker compose up -d --build",
+    "docker:poc": "node poc/remote.mjs",
+    "docker:logs": "docker compose logs -f",
+    "docker:down": "docker compose down -v"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

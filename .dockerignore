@@ -1,0 +1,9 @@
+**/node_modules
+artifacts
+env
+poc
+src
+.git
+.gitignore
+README.md
+package-lock.json

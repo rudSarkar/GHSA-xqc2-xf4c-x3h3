@@ -1,0 +1,94 @@
+# Two complete stacks of the same application: one on the vulnerable
+# react-server-dom-webpack 19.2.8, one on the patched 19.2.9. Running both at
+# once is the point - the remote exploit is pointed at each URL in turn and the
+# only difference between them is the package version.
+#
+#   docker compose up -d --build
+#   npm run docker:poc
+#
+# Each stack is a render tier (internal) plus a public web tier that consumes the
+# RSC payload and renders HTML. Only the web tiers publish a port.
+
+name: ghsa-xqc2-xf4c-x3h3
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+  restart: unless-stopped
+  init: true
+
+services:
+  # ---------------------------------------------------------------- vulnerable
+  rsc-vulnerable:
+    <<: *app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        REACT_VERSION: 19.2.8
+    command: ["node", "--conditions=react-server", "app/rsc-server.mjs"]
+    environment:
+      PORT: 3001
+      BLOB_SIZE: 3000
+    networks: [vulnerable]
+
+  web-vulnerable:
+    <<: *app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        REACT_VERSION: 19.2.8
+    command: ["node", "app/web-server.mjs"]
+    environment:
+      PORT: 3000
+      RSC_ORIGIN: http://rsc-vulnerable:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      # The payload's drop location. Bind-mounted so the exploit can read the
+      # evidence back from the host without the application exposing it.
+      - ./artifacts/remote/vulnerable:/proof
+    depends_on:
+      rsc-vulnerable:
+        condition: service_started
+    networks: [vulnerable]
+
+  # ------------------------------------------------------------------- patched
+  rsc-patched:
+    <<: *app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        REACT_VERSION: 19.2.9
+    command: ["node", "--conditions=react-server", "app/rsc-server.mjs"]
+    environment:
+      PORT: 3001
+      BLOB_SIZE: 3000
+    networks: [patched]
+
+  web-patched:
+    <<: *app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        REACT_VERSION: 19.2.9
+    command: ["node", "app/web-server.mjs"]
+    environment:
+      PORT: 3000
+      RSC_ORIGIN: http://rsc-patched:3001
+    ports:
+      - "4000:3000"
+    volumes:
+      - ./artifacts/remote/patched:/proof
+    depends_on:
+      rsc-patched:
+        condition: service_started
+    networks: [patched]
+
+networks:
+  vulnerable:
+  patched:
